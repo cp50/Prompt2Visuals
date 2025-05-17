@@ -98,18 +98,13 @@ Prompt2Visuals/
 
 ---
 
-## 📄 **License**
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
----
-
 ## 🤝 **Contributing**
 Contributions are welcome! Feel free to fork the repo and submit a pull request. 😊
 
 ---
 
 ## 📬 **Contact**
-For any queries or feedback, please reach out at **your-email@example.com**.
+For any queries or feedback, please reach out at **chrispaul68002@gmail.com**.
 
 ---
 
