@@ -1,0 +1,32 @@
+<!-- templates/result.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prompt2Visuals - Output Result</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container result-container">
+        <h1>✅ Output Generated</h1>
+        
+        <div class="result-card">
+            <p><strong>📝 Prompt:</strong> <span class="highlight">{{ prompt }}</span></p>
+            <p><strong>🎥 Output Type:</strong> <span class="highlight">{{ output | capitalize }}</span></p>
+
+            <div class="output-display">
+                {% if output == "image" %}
+                    <img src="{{ file_url }}" alt="Generated Image" class="output-image">
+                {% elif output == "video" %}
+                    <video controls>
+                        <source src="{{ file_url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                {% endif %}
+            </div>
+
+            <a href="/" class="btn-back">🔙 Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

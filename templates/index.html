@@ -1,0 +1,202 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MATHIFY - Generate Animations</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            overflow-x: hidden;
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        .dark-mode {
+            background-color: #0a0f18 !important;
+            color: #c9d1d9 !important;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: #ffffff;
+            text-align: center;
+            padding: 100px 20px;
+            border-bottom-left-radius: 100px;
+            border-bottom-right-radius: 100px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: background 0.5s;
+        }
+
+        .dark-mode .hero {
+            background: linear-gradient(135deg, #111, #333);
+        }
+
+        .hero h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.5em;
+            margin-bottom: 40px;
+            color: #ffffff;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            margin-top: -100px;
+            z-index: 2;
+            position: relative;
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        .dark-mode .container {
+            background-color: #161b22;
+            color: #c9d1d9;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: none;
+            background-color: #f5f5f5;
+            color: #333;
+            font-size: 1em;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dark-mode input[type="text"], .dark-mode select {
+            background-color: #21262d;
+            color: #c9d1d9;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #0072ff;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.03);
+        }
+
+        .interactive-button {
+            background-color: #ff5757;
+        }
+
+        .interactive-button:hover {
+            background-color: #ff3535;
+        }
+
+        .interactive-button-3d {
+            background-color: #ffb545;
+        }
+
+        .interactive-button-3d:hover {
+            background-color: #ff9632;
+        }
+
+        .theme-toggle {
+            background-color: #444c56;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background-color: #6e7681;
+            transform: rotate(360deg);
+        }
+
+        .dark-mode .theme-toggle {
+            background-color: #777;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>MATHIFY</h1>
+        <p>Unleash the Power of Mathematics and Visualization</p>
+    </div>
+
+    <div class="container">
+        <form action="/generate" method="post" onsubmit="this.querySelector('button').innerText='Generating...';">
+            <label for="prompt">Enter your prompt:</label>
+            <input type="text" id="prompt" name="prompt" required placeholder="e.g., y = x**2 or y = sin(x)" title="Enter a valid mathematical expression">
+            
+            <label for="output">Select output type:</label>
+            <select id="output" name="output">
+                <option value="video">Video (MP4)</option>
+                <option value="image">Image (PNG)</option>
+            </select>
+
+            <button type="submit">Generate</button>
+        </form>
+
+        <button class="interactive-button" onclick="window.location.href='/interactive'">
+            🔄 2D Interactive Mode
+        </button>
+
+        <button class="interactive-button-3d" onclick="window.location.href='/interactive3d'">
+            🌀 3D Interactive Mode
+        </button>
+
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.classList.toggle("dark-mode");
+            localStorage.setItem("darkMode", isDark ? "enabled" : "disabled");
+        }
+
+        // Load theme preference on page load
+        window.addEventListener("load", () => {
+            const darkModeSetting = localStorage.getItem("darkMode");
+            if (darkModeSetting === "enabled") {
+                document.body.classList.add("dark-mode");
+            }
+        });
+    </script>
+</body>
+</html>

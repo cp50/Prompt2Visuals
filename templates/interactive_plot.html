@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive 2D Math Visualization</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            overflow-x: hidden;
+        }
+        .controls {
+            width: 300px;
+            padding: 20px;
+            background: #1f1f1f;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            flex-shrink: 0;
+        }
+        .controls label {
+            color: #bbbbbb;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .controls input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            background: #222;
+            color: #fff;
+        }
+        .slider-container {
+            margin-bottom: 20px;
+        }
+        input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: #444;
+            border-radius: 5px;
+            height: 8px;
+            outline: none;
+            transition: background 0.3s;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #00bcd4;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(0, 188, 212, 0.6);
+            transition: background 0.3s;
+        }
+        .slider-container span {
+            color: #00bcd4;
+            font-weight: bold;
+        }
+        .plot-container {
+            flex-grow: 1;
+            background: #1f1f1f;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            width: calc(100vw - 380px);
+            height: 90vh;
+        }
+        .btn-back {
+            background-color: #00bcd4;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+        .btn-back:hover {
+            background-color: #0097a7;
+        }
+        .action-button {
+            background-color: #f39c12;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            margin-bottom: 10px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        .action-button:hover {
+            background-color: #e67e22;
+        }
+        .analysis-results {
+            margin-top: 20px;
+            background-color: #1f1f1f;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            max-height: 300px;
+            overflow-y: auto;
+            color: #ffffff;
+        }
+        .analysis-results h3 {
+            margin-top: 0;
+            color: #f39c12;
+        }
+        .analysis-results ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .analysis-results ul li {
+            margin-bottom: 8px;
+            background: #333;
+            padding: 10px;
+            border-radius: 5px;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>🎛️ 2D Function Controls</h2>
+        <label for="function">Function (y = f(x)):</label>
+        <input type="text" id="function" value="sin(x)" placeholder="Enter a function (e.g., sin(x))" />
+
+        <div class="slider-container">
+            <label>Amplitude (A):</label>
+            <input type="range" id="amplitude" min="0.1" max="5" step="0.1" value="1">
+            <span id="amplitude-value">1</span>
+        </div>
+
+        <div class="slider-container">
+            <label>Frequency (f):</label>
+            <input type="range" id="frequency" min="0.1" max="5" step="0.1" value="1">
+            <span id="frequency-value">1</span>
+        </div>
+
+        <div class="slider-container">
+            <label>Phase (φ):</label>
+            <input type="range" id="phase" min="-3.14" max="3.14" step="0.1" value="0">
+            <span id="phase-value">0</span>
+        </div>
+
+        <button class="action-button" onclick="updateFunction()">🔄 Update Plot</button>
+        <button class="action-button" onclick="analyzeFunction()">🔍 Analyze Function</button>
+
+        <a href="/" class="btn-back">🔙 Back to Home</a>
+
+        <div class="analysis-results" id="analysis-results">
+            <h3>📝 Analysis Results</h3>
+            <ul id="analysis-list"></ul>
+        </div>
+    </div>
+
+    <div class="plot-container">
+        <div id="plot"></div>
+    </div>
+
+    <script>
+        let ws = new WebSocket(`ws://${window.location.host}/ws/plot`);
+
+        function updateFunction(analyze = false) {
+            const func = document.getElementById('function').value;
+            const A = parseFloat(document.getElementById('amplitude').value);
+            const f = parseFloat(document.getElementById('frequency').value);
+            const phi = parseFloat(document.getElementById('phase').value);
+
+            ws.send(JSON.stringify({
+                function: func,
+                parameters: {
+                    amplitude: A,
+                    frequency: f,
+                    phase: phi,
+                    analyze: analyze
+                }
+            }));
+        }
+
+        function analyzeFunction() {
+            updateFunction(true);
+        }
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.x && data.y) {
+                const trace = { x: data.x, y: data.y, type: 'scatter', mode: 'lines' };
+                Plotly.react('plot', [trace], {});
+            }
+
+            if (data.analysis) {
+                const resultsList = document.getElementById("analysis-list");
+                resultsList.innerHTML = "";
+                for (const [key, points] of Object.entries(data.analysis)) {
+                    points.forEach(point => {
+                        resultsList.innerHTML += `<li><strong>${key}:</strong> (${point[0].toFixed(2)}, ${point[1].toFixed(2)})</li>`;
+                    });
+                }
+            }
+        };
+
+        window.addEventListener('load', () => updateFunction(false));
+    </script>
+</body>
+</html>

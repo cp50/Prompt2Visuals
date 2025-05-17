@@ -1,0 +1,176 @@
+<!-- templates/interactive_plot_3d.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive 3D Math Visualization</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            overflow-x: hidden;
+        }
+        .controls {
+            width: 300px;
+            padding: 20px;
+            background: #1f1f1f;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+        .controls label {
+            color: #bbbbbb;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .controls input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            background: #222;
+            color: #fff;
+        }
+        .slider-container {
+            margin-bottom: 20px;
+        }
+        .plot-container {
+            flex-grow: 1;
+            background: #1f1f1f;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            width: calc(100vw - 380px);  /* Full width minus controls */
+            height: 90vh;  /* Make it almost full screen */
+        }
+        .btn-back {
+            background-color: #00bcd4;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+        .btn-back:hover {
+            background-color: #0097a7;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>🎛️ 3D Function Controls</h2>
+        <label for="function">Function (z = f(x,y)):</label>
+        <input type="text" id="function" value="sin(x) * cos(y)" placeholder="Enter a function (e.g., sin(x) * cos(y))" />
+
+        <div class="slider-container">
+            <label>Amplitude (A):</label>
+            <input type="range" id="amplitude" min="0.1" max="5" step="0.1" value="1">
+            <span id="amplitude-value">1</span>
+        </div>
+
+        <div class="slider-container">
+            <label>Frequency (f):</label>
+            <input type="range" id="frequency" min="0.1" max="5" step="0.1" value="1">
+            <span id="frequency-value">1</span>
+        </div>
+
+        <div class="slider-container">
+            <label>Phase (φ):</label>
+            <input type="range" id="phase" min="-3.14" max="3.14" step="0.1" value="0">
+            <span id="phase-value">0</span>
+        </div>
+
+        <a href="/" class="btn-back">🔙 Back to Home</a>
+    </div>
+
+    <div class="plot-container">
+        <div id="plot"></div>
+    </div>
+
+    <script>
+        let ws = new WebSocket(`ws://${window.location.host}/ws/plot3d`);
+        
+        function updatePlot(data) {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            const trace = {
+                x: data.x,
+                y: data.y,
+                z: data.z,
+                type: 'surface',
+                colorscale: 'Viridis'
+            };
+            const layout = {
+                title: 'Interactive 3D Function Plot',
+                scene: {
+                    xaxis: {title: 'x'},
+                    yaxis: {title: 'y'},
+                    zaxis: {title: 'z'},
+                    bgcolor: '#1f1f1f'
+                },
+                paper_bgcolor: '#1f1f1f',
+                font: {color: '#ffffff'},
+                width: window.innerWidth - 400,
+                height: window.innerHeight - 100
+            };
+            Plotly.react('plot', [trace], layout, {responsive: true});
+        }
+
+        function updateFunction() {
+            const func = document.getElementById('function').value;
+            const A = parseFloat(document.getElementById('amplitude').value);
+            const f = parseFloat(document.getElementById('frequency').value);
+            const phi = parseFloat(document.getElementById('phase').value);
+
+            ws.send(JSON.stringify({
+                function: func,
+                parameters: {
+                    amplitude: A,
+                    frequency: f,
+                    phase: phi
+                }
+            }));
+        }
+
+        // Event listeners for controls
+        ['amplitude', 'frequency', 'phase'].forEach(id => {
+            const slider = document.getElementById(id);
+            const value = document.getElementById(`${id}-value`);
+            slider.addEventListener('input', (e) => {
+                value.textContent = e.target.value;
+                updateFunction();
+            });
+        });
+
+        document.getElementById('function').addEventListener('change', updateFunction);
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            updatePlot(data);
+        };
+
+        window.addEventListener('load', updateFunction);
+    </script>
+</body>
+</html>
