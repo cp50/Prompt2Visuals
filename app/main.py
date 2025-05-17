@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request, Form, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 from app.utils import generate_manim_output
 from app.analysis import find_critical_points  # Import the analysis module
 from .websocket import manager
@@ -9,6 +10,15 @@ import os
 import numpy as np
 
 app = FastAPI()
+
+# Enable CORS for WebSocket support
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (you can restrict this if needed)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
@@ -123,7 +133,7 @@ async def websocket_endpoint_2d(websocket: WebSocket):
         print("🔌 Client disconnected (2D)")
         manager.disconnect(websocket)
 
-        # WebSocket endpoint for 3D plotting
+# WebSocket endpoint for 3D plotting
 @app.websocket("/ws/plot3d")
 async def websocket_endpoint_3d(websocket: WebSocket):
     try:
@@ -184,4 +194,3 @@ async def websocket_endpoint_3d(websocket: WebSocket):
 
     except WebSocketDisconnect:
         print("🔌 3D Client disconnected")
-

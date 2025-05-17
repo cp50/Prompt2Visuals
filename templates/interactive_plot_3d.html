@@ -107,7 +107,7 @@
     </div>
 
     <script>
-        let ws = new WebSocket(`ws://${window.location.host}/ws/plot3d`);
+        let ws = new WebSocket(`wss://${window.location.host}/ws/plot3d`);
         
         function updatePlot(data) {
             if (data.error) {

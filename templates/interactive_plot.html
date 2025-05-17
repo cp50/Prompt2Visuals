@@ -182,7 +182,7 @@
     </div>
 
     <script>
-        let ws = new WebSocket(`ws://${window.location.host}/ws/plot`);
+        let ws = new WebSocket(`wss://${window.location.host}/ws/plot`);
 
         function updateFunction(analyze = false) {
             const func = document.getElementById('function').value;
