@@ -219,3 +219,91 @@ video:hover {
 .dark-mode .btn-back:hover {
     background-color: #0097a7;
 }
+
+/* Enhanced Responsive Design */
+@media (max-width: 600px) {
+    .container,
+    .result-container {
+        width: 99vw;
+        max-width: 99vw;
+        margin: 8px 0 0 0;
+        padding: 6vw 2vw 8vw 2vw;
+        border-radius: 5vw;
+        box-sizing: border-box;
+    }
+
+    .result-card {
+        padding: 4vw 2vw;
+        border-radius: 4vw;
+        margin-top: 4vw;
+    }
+
+    h1, .result-container h1 {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+    }
+
+    .result-card p {
+        font-size: 1em;
+        margin-bottom: 10px;
+    }
+
+    input[type="text"], select, button, .btn-back {
+        font-size: 1em;
+        padding: 3vw 0;
+        border-radius: 4vw;
+        margin-bottom: 10px;
+    }
+
+    .btn-back {
+        width: 100%;
+        min-width: 0;
+        font-size: 1em;
+        padding: 3vw 0;
+        margin-top: 10px;
+        margin-bottom: 0;
+        display: block;
+        box-sizing: border-box;
+    }
+
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 1em;
+        bottom: 10px;
+        right: 10px;
+    }
+
+    .output-image, video {
+        border-radius: 4vw;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 400px) {
+    .container,
+    .result-container,
+    .result-card {
+        padding: 2vw 1vw;
+        border-radius: 3vw;
+    }
+    h1, .result-container h1 {
+        font-size: 0.95em;
+    }
+    .btn-back {
+        font-size: 0.95em;
+        padding: 2vw 0;
+    }
+}
+
+/* Ensure images and videos never overflow */
+.output-image, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Make sure html and body take full height for better mobile scaling */
+html, body {
+    min-height: 100%;
+}

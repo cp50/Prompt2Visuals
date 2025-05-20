@@ -5,26 +5,30 @@
     <title>Interactive 2D Math Visualization</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link rel="stylesheet" href="/static/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
             background-color: #121212;
             color: #ffffff;
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
             flex-direction: row;
             gap: 20px;
-            overflow-x: hidden;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
         .controls {
-            width: 300px;
-            padding: 20px;
+            width: 320px;
+            max-width: 100vw;
+            padding: 24px 18px;
             background: #1f1f1f;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             border: 1px solid #333;
             flex-shrink: 0;
+            box-sizing: border-box;
         }
         .controls label {
             color: #bbbbbb;
@@ -40,50 +44,43 @@
             border-radius: 8px;
             background: #222;
             color: #fff;
+            font-size: 1em;
+            box-sizing: border-box;
         }
         .slider-container {
             margin-bottom: 20px;
         }
-        input[type="range"] {
-            width: 100%;
-            -webkit-appearance: none;
-            appearance: none;
-            background-color: #444;
-            border-radius: 5px;
-            height: 8px;
-            outline: none;
-            transition: background 0.3s;
+        .slider-container label {
+            font-size: 1em;
         }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: #00bcd4;
-            cursor: pointer;
-            box-shadow: 0 0 8px rgba(0, 188, 212, 0.6);
-            transition: background 0.3s;
+        .slider-container input[type="range"] {
+            width: 100%;
         }
         .slider-container span {
             color: #00bcd4;
             font-weight: bold;
+            margin-left: 8px;
         }
         .plot-container {
             flex-grow: 1;
             background: #1f1f1f;
             border-radius: 12px;
-            padding: 20px;
+            padding: 24px 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             border: 1px solid #333;
-            width: calc(100vw - 380px);
-            height: 90vh;
+            margin: 32px 32px 32px 0;
+            min-width: 0;
+            min-height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
         }
         .btn-back {
             background-color: #00bcd4;
             color: #fff;
             border: none;
-            padding: 12px 20px;
+            padding: 10px 18px;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
@@ -91,10 +88,17 @@
             display: inline-block;
             text-decoration: none;
             margin-bottom: 20px;
-            transition: background 0.3s;
+            transition: background 0.3s, transform 0.2s;
+            width: auto;
+            min-width: 120px;
+            max-width: 100%;
+            font-size: 1em;
+            box-sizing: border-box;
         }
-        .btn-back:hover {
+        .btn-back:hover, .btn-back:active, .btn-back:focus {
             background-color: #0097a7;
+            transform: scale(1.03);
+            outline: none;
         }
         .action-button {
             background-color: #f39c12;
@@ -105,11 +109,12 @@
             font-weight: bold;
             cursor: pointer;
             text-align: center;
-            display: inline-block;
+            display: block;
             text-decoration: none;
             margin-bottom: 10px;
             width: 100%;
             transition: background 0.3s;
+            font-size: 1em;
         }
         .action-button:hover {
             background-color: #e67e22;
@@ -139,6 +144,82 @@
             padding: 10px;
             border-radius: 5px;
             color: #ffffff;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+                gap: 0;
+                padding: 0;
+            }
+            .controls {
+                width: 100%;
+                max-width: 100vw;
+                margin: 0;
+                border-radius: 0 0 12px 12px;
+                padding: 18px 8px 10px 8px;
+            }
+            .plot-container {
+                width: 100%;
+                margin: 0;
+                border-radius: 12px 12px 0 0;
+                padding: 10px 2px;
+                height: 60vh;
+                min-height: 220px;
+            }
+        }
+        @media (max-width: 600px) {
+            .controls {
+                padding: 8px 2vw 6px 2vw;
+                border-radius: 0 0 10px 10px;
+            }
+            .plot-container {
+                padding: 2px 0;
+                border-radius: 10px 10px 0 0;
+                height: 40vh;
+                min-height: 120px;
+            }
+            .btn-back {
+                width: 100%;
+                font-size: 1em;
+                padding: 10px 0;
+                margin-bottom: 14px;
+            }
+            .action-button {
+                font-size: 0.98em;
+                padding: 10px 0;
+            }
+            h2 {
+                font-size: 1.05em;
+            }
+            label, .slider-container label {
+                font-size: 0.97em;
+            }
+            .controls input[type="text"] {
+                font-size: 0.98em;
+                padding: 8px;
+            }
+            .slider-container input[type="range"] {
+                height: 24px;
+            }
+        }
+        @media (max-width: 400px) {
+            .controls, .plot-container {
+                padding: 1px 0;
+                border-radius: 0;
+            }
+            .btn-back, .action-button {
+                font-size: 0.95em;
+                padding: 8px 0;
+            }
+        }
+        /* Make Plotly plot always fit container */
+        #plot {
+            width: 100% !important;
+            height: 100% !important;
+            min-width: 0;
+            min-height: 0;
         }
     </style>
 </head>
@@ -182,7 +263,7 @@
     </div>
 
     <script>
-        let ws = new WebSocket(`wss://${window.location.host}/ws/plot`);
+        let ws = new WebSocket(`ws://${window.location.host}/ws/plot`);
 
         function updateFunction(analyze = false) {
             const func = document.getElementById('function').value;
@@ -209,7 +290,17 @@
             const data = JSON.parse(event.data);
             if (data.x && data.y) {
                 const trace = { x: data.x, y: data.y, type: 'scatter', mode: 'lines' };
-                Plotly.react('plot', [trace], {});
+                // Responsive width/height for Plotly
+                const plotWidth = Math.max(320, Math.min(window.innerWidth - 60, 900));
+                const plotHeight = window.innerWidth < 900 ? 0.5 * window.innerHeight : 0.8 * window.innerHeight;
+                Plotly.react('plot', [trace], {
+                    width: plotWidth,
+                    height: plotHeight,
+                    paper_bgcolor: '#1f1f1f',
+                    plot_bgcolor: '#1f1f1f',
+                    font: {color: '#fff'},
+                    margin: {l: 40, r: 20, t: 40, b: 40}
+                }, {responsive: true});
             }
 
             if (data.analysis) {
@@ -223,7 +314,23 @@
             }
         };
 
+        // Update slider values and plot on input
+        ['amplitude', 'frequency', 'phase'].forEach(id => {
+            const slider = document.getElementById(id);
+            const value = document.getElementById(`${id}-value`);
+            slider.addEventListener('input', (e) => {
+                value.textContent = e.target.value;
+                updateFunction();
+            });
+        });
+
+        document.getElementById('function').addEventListener('change', () => updateFunction(false));
+
         window.addEventListener('load', () => updateFunction(false));
+        window.addEventListener('resize', () => {
+            // Re-render plot on resize for responsiveness
+            document.getElementById('function').dispatchEvent(new Event('change'));
+        });
     </script>
 </body>
 </html>
